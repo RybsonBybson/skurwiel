@@ -1,63 +1,53 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Copy, Minus, Moon, Pin, Square, Sun, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Copy,
+  Minus,
+  Moon,
+  Pin,
+  Square,
+  Sun,
+  X,
+} from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useEffect, useState } from "react";
-import { useAppNavigate } from "@/hooks/useAppNavigate";
 import { useHistoryStore } from "@/store/useHistoryStore";
-import { useShallow } from "zustand/react/shallow";
 import SearchAll from "./template-parts/SearchAll";
 import { useThemeStore } from "@/store/useThemeStore";
+import { commands } from "@/hooks/commands";
+import { useWindowStore } from "@/store/useWindowStore";
 
 function FrameLeft() {
-  const cw = getCurrentWindow();
-  const [onTop, setOnTop] = useState(false);
-  const { forward, back, decrementCurrent, incrementCurrent } = useHistoryStore(
-    useShallow((state) => ({
-      routes: state.routes,
-      back: state.back,
-      forward: state.forward,
-      decrementCurrent: state.decrementCurrent,
-      incrementCurrent: state.incrementCurrent,
-    })),
-  );
-  const { theme, setTheme } = useThemeStore(
-    useShallow((state) => ({
-      skin: state.skin,
-      theme: state.theme,
-      setSkin: state.setSkin,
-      setTheme: state.setTheme,
-    })),
-  );
-  const navigate = useAppNavigate();
-  const goforward = () => {
-    if (!forward) return;
-    navigate(forward, false);
-    incrementCurrent();
-  };
-  const goback = () => {
-    if (!back) return;
-    navigate(back, false);
-    decrementCurrent();
-  };
-  const pin = async () => {
-    const isAlwaysOnTop = await cw.isAlwaysOnTop();
-    await cw.setAlwaysOnTop(!isAlwaysOnTop);
-    setOnTop(!isAlwaysOnTop);
-  };
+  const theme = useThemeStore((state) => state.theme);
+  const forward = useHistoryStore((state) => state.forward);
+  const back = useHistoryStore((state) => state.back);
+  const onTop = useWindowStore((state) => state.onTop);
 
   return (
     <div className="justify-start">
-      <Button variant={"ghost"} onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+      <Button
+        variant={"ghost"}
+        onClick={commands.get("window:toggle-theme")?.action}
+      >
         {theme === "dark" && <Sun />}
         {theme === "light" && <Moon />}
       </Button>
-      <Button variant={"ghost"} onClick={pin}>
+      <Button variant={"ghost"} onClick={commands.get("window:pin")?.action}>
         <Pin fill={onTop ? "currentColor" : "none"} />
       </Button>
-      <Button variant={"ghost"} disabled={back === null} onClick={goback}>
+      <Button
+        variant={"ghost"}
+        disabled={back === null}
+        onClick={commands.get("app:goback")?.action}
+      >
         <ArrowLeft />
       </Button>
-      <Button variant={"ghost"} disabled={forward === null} onClick={goforward}>
+      <Button
+        variant={"ghost"}
+        disabled={forward === null}
+        onClick={commands.get("app:goforward")?.action}
+      >
         <ArrowRight />
       </Button>
     </div>
@@ -90,11 +80,18 @@ function FrameRight() {
       <Button variant={"ghost"} onClick={() => cw.minimize()}>
         <Minus />
       </Button>
-      <Button variant={"ghost"} onClick={() => (maximized ? cw.unmaximize() : cw.maximize())}>
+      <Button
+        variant={"ghost"}
+        onClick={() => (maximized ? cw.unmaximize() : cw.maximize())}
+      >
         {maximized && <Copy className="scale-x-[-1]" />}
         {!maximized && <Square />}
       </Button>
-      <Button variant={"ghost"} onClick={() => cw.close()} className="hover:bg-rose-600!">
+      <Button
+        variant={"ghost"}
+        onClick={() => cw.close()}
+        className="hover:bg-rose-600!"
+      >
         <X />
       </Button>
     </div>
