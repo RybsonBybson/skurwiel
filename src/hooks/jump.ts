@@ -1,11 +1,18 @@
-import { useHistoryStore } from "@/store/useHistoryStore";
-import { redirect } from "react-router-dom";
+import { NavigateFunction } from "react-router-dom";
 
-export const jump = (to: string, history: boolean = true) => {
-  redirect(to);
-  if (!history) return;
-  const { add, current, slice } = useHistoryStore.getState();
+let _navigate: NavigateFunction | null = null;
 
-  slice(0, current);
-  add(to);
+export const setNavigate = (fn: NavigateFunction) => {
+  _navigate = fn;
+};
+
+const navigate = (to: string) => {
+  _navigate?.(to);
+};
+
+export const jump = (to: string) => {
+  navigate(to);
+
+  // Historia jest zarządzana automatycznie przez useEffect w main.tsx
+  // więc nie potrzebujemy dodatkowej logiki tutaj
 };

@@ -6,6 +6,7 @@ import {
   Minus,
   Moon,
   Pin,
+  RefreshCw,
   Square,
   Sun,
   X,
@@ -35,6 +36,9 @@ function FrameLeft() {
       </Button>
       <Button variant={"ghost"} onClick={commands.get("window:pin")?.action}>
         <Pin fill={onTop ? "currentColor" : "none"} />
+      </Button>
+      <Button variant={"ghost"} onClick={() => window.location.reload()}>
+        <RefreshCw />
       </Button>
       <Button
         variant={"ghost"}

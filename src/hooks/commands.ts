@@ -22,7 +22,6 @@ type CommandID =
   | "chat:new"
   | "app:goforward"
   | "app:goback";
-
 export interface CommandData {
   name: string;
   shortcut: Shortcut | null;
@@ -82,3 +81,5 @@ export const commands = new Map<CommandID, CommandData>([
     },
   ],
 ]);
+
+
